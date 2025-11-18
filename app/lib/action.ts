@@ -28,8 +28,16 @@ function returnMessageForUpdateInvoice () {
   return { message: 'Database Error: Failed to Create Invoice.'}
 }
 
+export type State = {
+  errors?: {
+    customerId?: string[];
+    amount?: string[];
+    status?: string[];
+  };
+  message?: string | null;
+}
 
-export async function createInvoice(formData: FormData) {
+export async function createInvoice(prevState: State, formData: FormData) { // prevStateはuseActionStateから渡された状態を含む。使用しないが必須のプロパティ。
     const { customerId, amount, status} = CreateInvoice.parse({
         customerId: formData.get('customerId'),
         amount: formData.get('amount'),
@@ -84,11 +92,3 @@ export async function deleteInvoice(id: string) {
   revalidatePath('/dashboard/invoices');
 }
 
-export type State = {
-  errors?: {
-    customerId?: string[];
-    amount?: string[];
-    status?: string[];
-  };
-  message?: string | null;
-}
