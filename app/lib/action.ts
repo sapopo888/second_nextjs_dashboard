@@ -20,6 +20,10 @@ const UpdateInvoice = FormSchema.omit({ id: true, date: true });
 function returnMessageForCreateInvoice () {
   return { message: 'Database Error: Failed to Create Invoice.'}
 }
+function returnMessageForUpdateInvoice () {
+  return { message: 'Database Error: Failed to Create Invoice.'}
+}
+
 
 export async function createInvoice(formData: FormData) {
     const { customerId, amount, status} = CreateInvoice.parse({
@@ -53,12 +57,17 @@ export async function updateInvoice(id: string, formData: FormData) {
   });
  
   const amountInCents = amount * 100;
- 
-  await sql`
-    UPDATE invoices
-    SET customer_id = ${customerId}, amount = ${amountInCents}, status = ${status}
-    WHERE id = ${id}
-  `;
+
+  try {
+    await sql`
+      UPDATE invoices
+      SET customer_id = ${customerId}, amount = ${amountInCents}, status = ${status}
+      WHERE id = ${id}
+    `;
+  } catch(error) {
+    console.error(error);
+    returnMessageForUpdateInvoice();
+  }
  
   revalidatePath('/dashboard/invoices');
   redirect('/dashboard/invoices');
